@@ -1,31 +1,39 @@
 export type Game = {
-	readonly currentPlayer: string
-	readonly currentYear: string
-	readonly endTurn: () => void
+	readonly computeNextTurn: (currentState: GameState) => GameState
 }
 
-const playerRed = "Red"
-const playerBlue = "Blue"
+export type GameState = {
+	readonly currentPlayer: Player
+	readonly currentYear: Year
+}
+
+export type Player = "blue" | "red"
+export type Year = number
 
 export function composeAlphaCivGame(): Game {
-	let currentPlayer = playerRed
-	let currentYear = "4000 BCE"
-	
+	const yearsToAdvancePerRound = 100
+
 	return {
-		get currentPlayer() {
-			return currentPlayer
-		},
-		get currentYear() {
-			return currentYear
-		},
-		endTurn: () => {
-			if (currentPlayer === playerRed) {
-				currentPlayer = playerBlue
-			} else {
-				currentPlayer = playerRed
+		computeNextTurn: (currentState) => {
+			switch (currentState.currentPlayer) {
+				case "red":
+					return {
+						currentYear: currentState.currentYear,
+						currentPlayer: "blue",
+					}
+				case "blue":
+					return {
+						currentYear: currentState.currentYear + yearsToAdvancePerRound,
+						currentPlayer: "red",
+					}
 			}
-			
-			currentYear = "3900 BCE"
-		}
+		},
+	}
+}
+
+export function createInitialGameState(): GameState {
+	return {
+		currentPlayer: "red",
+		currentYear: -4000,
 	}
 }
